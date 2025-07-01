@@ -29,7 +29,7 @@ S3_OUTPUT_DIRECTORY = "output"
 # -----------------------------
 # Athena Client Setup
 # -----------------------------
-# Connect to Athena using boto3 client
+# Connect to Athena using the boto3 client
 athena_client = boto3.client(
     "athena",
     aws_access_key_id=AWS_ACCESS_KEY,              
@@ -98,7 +98,7 @@ enigma_jhud_df = download_and_load_query_results(athena_client, response_enigma_
 # print(enigma_jhud_df.head())  # Show preview of result
 
 # -----------------------------------------------------------------------------------------------------------------
-# Execute Athena Query2 for table 2 : countrycode
+# Execute Athena Query2 for table 2: countrycode
 # -----------------------------------------------------------------------------------------------------------------
 response_countrycode= athena_client.start_query_execution(
     QueryString="SELECT * FROM countrycode",   
@@ -161,8 +161,8 @@ response_state_abv= athena_client.start_query_execution(
 state_abv_df = download_and_load_query_results(athena_client, response_state_abv)
 #print(state_abv_df.head())  # Show preview of result
 
-# Headers read as first row, convert firat row to header back
-# Grab the first row as header
+# Headers read as first row, convert first row to header back
+# Grab the first row as a header
 new_header = state_abv_df.iloc[0]
 state_abv_df = state_abv_df[1:] # truncuate header
 state_abv_df.columns = new_header
@@ -253,8 +253,8 @@ us_total_latest_df = download_and_load_query_results(athena_client, response_us_
 ###############################################################################################################
 # Convert data model to dimensional model
 # Create fact table and dimension tables; factCovid, dimRegion, dimHospital, dimDate
-# Join tables to create and collect table data to gether as in STAR SCHEMA 
-# It also can be done on Amazon Athena
+# Join tables to create and collect table data together as in STAR SCHEMA 
+# It can also be done on Amazon Athena
 
 # -----------------------------------------------------------------------------------------------------------------
 # factCovid
@@ -275,7 +275,7 @@ dimRegion = pd.merge(dimRegion_1, dimRegion_2, on ='fips', how='inner')
 # -----------------------------------------------------------------------------------------------------------------
 # dimHospital
 # -----------------------------------------------------------------------------------------------------------------
-dimHospital = hospital_beds_df[['fips', 'state_name', 'latitude', 'longtitude', 'hq_address', 'hospital_name', 'hospital_type', 'hq_city', 'hq_state']]
+dimHospital = hospital_beds_df[['fips', 'state_name', 'latitude', 'longitude', 'hq_address', 'hospital_name', 'hospital_type', 'hq_city', 'hq_state']]
 #print(dimHospital.head())
 
 # -----------------------------------------------------------------------------------------------------------------
@@ -318,4 +318,22 @@ print(csv_buffer.getvalue())
 dimDate.to_csv(csv_buffer)
 s3_resource.Object(bucket, 'output/dimDate.csv').put(Body=csv_buffer.getvalue())
 
+###############################################################################################################
+# 4. Copy data to Redshift - Loading
+###############################################################################################################
+
+# -----------------------------------------------------------------------------------------------------------------
+# Get Schema of the tables: factCovid, dimHospital, dimRegion, dimDate
+# -----------------------------------------------------------------------------------------------------------------
+factCovidSchema = pd.io.sql.get_schema(factCovid.reset_index(), 'factCovid')
+#print(''.join(factCovidSchema))
+
+dimHospitalSchema = pd.io.sql.get_schema(dimHospital.reset_index(), 'dimHospital')
+#print(''.join(dimHospitalSchema))
+
+dimRegionSchema = pd.io.sql.get_schema(dimRegion.reset_index(), 'dimRegion')
+##print(''.join(dimRegionSchema))
+
+dimDateSchema = pd.io.sql.get_schema(dimDate.reset_index(), 'dimDate')
+#print(''.join(dimDateSchema))
 
