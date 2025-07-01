@@ -169,7 +169,6 @@ state_abv_df.columns = new_header
 # print(state_abv_df.head())
 
 
-
 # -----------------------------------------------------------------------------------------------------------------
 # Execute Athena Query6 for table 6: states_daily
 # -----------------------------------------------------------------------------------------------------------------
@@ -248,3 +247,44 @@ response_us_total_latest= athena_client.start_query_execution(
 
 us_total_latest_df = download_and_load_query_results(athena_client, response_us_total_latest)
 #print(us_total_latest_df.head())  # Show preview of result
+
+###############################################################################################################
+# 2. ETL job in Python - Transformation
+###############################################################################################################
+# Convert data model to dimensional model
+# Create fact table and dimension tables; factCovid, dimRegion, dimHospital, dimDate
+# Join tables to create and collect table data to gether as in STAR SCHEMA 
+# It also can be done on Amazon Athena
+
+# -----------------------------------------------------------------------------------------------------------------
+# factCovid
+# -----------------------------------------------------------------------------------------------------------------
+factCovid_1 = enigma_jhud_df[['fips', 'province_state', 'country_region', 'confirmed', 'deaths', 'recovered', 'active']]
+factCovid_2 = states_daily_df[['fips', 'date', 'positive', 'negative', 'hospitalizedcurrently', 'hospitalized', 'hospitalizeddischarged']]
+factCovid = pd.merge(factCovid_1 ,factCovid_2, on='fips', how='inner')
+#print(factCovid.head())
+
+# -----------------------------------------------------------------------------------------------------------------
+# dimRegion
+# -----------------------------------------------------------------------------------------------------------------
+dimRegion_1 = enigma_jhud_df[['fips', 'province_state', 'country_region', 'latitude','longitude']]
+dimRegion_2 = us_county_df[['fips','county', 'state']]
+dimRegion = pd.merge(dimRegion_1, dimRegion_2, on ='fips', how='inner')
+#print(dimRegion.head())
+
+# -----------------------------------------------------------------------------------------------------------------
+# dimHospital
+# -----------------------------------------------------------------------------------------------------------------
+dimHospital = hospital_beds_df[['fips', 'state_name', 'latitude', 'longtitude', 'hq_address', 'hospital_name', 'hospital_type', 'hq_city', 'hq_state']]
+#print(dimHospital.head())
+
+# -----------------------------------------------------------------------------------------------------------------
+# dimDate
+# -----------------------------------------------------------------------------------------------------------------
+dimDate = states_daily_df[['fips', 'date']]
+
+dimDate = dimDate.copy()
+dimDate['date'] = pd.to_datetime(dimDate['date'], format='%Y%m%d')
+dimDate['year'] = dimDate['date'].dt.year
+dimDate['month'] = dimDate['date'].dt.month
+dimDate['day_of_week'] = dimDate['date'].dt.dayofweek
