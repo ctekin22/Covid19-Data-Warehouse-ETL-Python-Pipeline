@@ -288,3 +288,34 @@ dimDate['date'] = pd.to_datetime(dimDate['date'], format='%Y%m%d')
 dimDate['year'] = dimDate['date'].dt.year
 dimDate['month'] = dimDate['date'].dt.month
 dimDate['day_of_week'] = dimDate['date'].dt.dayofweek
+
+###############################################################################################################
+# 3. Store tables into S3 bucket - Loading
+###############################################################################################################
+bucket = 'covid-19-data-de'
+csv_buffer = StringIO() # binary format
+
+s3_resource = boto3.resource(
+    's3',
+    aws_access_key_id="AKIAZDSAVGW7IJPPOUNG",
+    aws_secret_access_key="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"
+)
+
+# factCovid
+factCovid.to_csv(csv_buffer)
+s3_resource.Object(bucket, 'output/factCovid.csv').put(Body=csv_buffer.getvalue())
+
+# dimRegion
+dimRegion.to_csv(csv_buffer)
+s3_resource.Object(bucket, 'output/dimRegion.csv').put(Body=csv_buffer.getvalue())
+
+# dimHospital
+dimHospital.to_csv(csv_buffer)
+s3_resource.Object(bucket, 'output/dimHospital.csv').put(Body=csv_buffer.getvalue())
+print(csv_buffer.getvalue())
+
+# dimDate
+dimDate.to_csv(csv_buffer)
+s3_resource.Object(bucket, 'output/dimDate.csv').put(Body=csv_buffer.getvalue())
+
+
