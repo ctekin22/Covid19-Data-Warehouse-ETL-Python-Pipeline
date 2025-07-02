@@ -83,3 +83,43 @@ CREATE TABLE "dimDate" (
   "day_of_week" INTEGER
 )
 """)
+
+# -----------------------------------------------------------------------------------------------------------------
+# Copy tables in Redshift
+# -----------------------------------------------------------------------------------------------------------------
+
+# Copy factCovid
+cursor.execute("""
+copy factCovid from 's3://covid-19-data-de/output/factCovid.csv'
+credentials 'aws_iam_role=arn:aws:iam::626127091134:role/redshift-s3-access'
+delimiter ','
+region 'us-east-1'
+IGNOREHEADER 1
+""")
+
+# Copy dimRegion
+cursor.execute("""
+copy dimRegion from 's3://covid-19-data-de/output/dimRegion.csv'
+credentials 'aws_iam_role=arn:aws:iam::626127091134:role/redshift-s3-access'
+delimiter ','
+region 'us-east-1'
+IGNOREHEADER 1
+""")
+
+# Copy dimDate
+cursor.execute("""
+copy dimDate from 's3://covid-19-data-de/output/dimDate.csv'
+credentials 'aws_iam_role=arn:aws:iam::626127091134:role/redshift-s3-access'
+delimiter ','
+region 'us-east-1'
+IGNOREHEADER 1
+""")
+
+# Copy dimHospital
+cursor.execute("""
+copy dimHospital from 's3://covid-19-data-de/output/dimHospital.csv'
+credentials 'aws_iam_role=arn:aws:iam::626127091134:role/redshift-s3-access'
+delimiter ','
+region 'us-east-1'
+IGNOREHEADER 1
+""")
