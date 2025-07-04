@@ -17,7 +17,7 @@ o	IAM users ensure principle of least privilege, keeping AWS access secure and a
 Step 2: Upload the dataset to your S3 bucket
 •	Goal: Store the raw COVID-19 dataset in a centralized, durable, and scalable storage (S3) for processing.
 •	What to Do:
-o	Go to Amazon S3 service.
+	Go to the Amazon S3 service.
 o	Navigate to the S3 bucket you created 
 o	Upload your dataset files manually or 
 o	Use the AWS Console or the AWS CLI:
@@ -34,7 +34,7 @@ Automatically discover the schema and metadata of your data to build an accurate
 
 What to Do:
 Create a Glue crawler for each dataset:
-•	Name as table name for easy identification
+•	Name the table for easy identification
 •	Specify the crawler source type:
 o	Since you are starting fresh, choose Data stores as the data source.
 o	Select Amazon S3 as the data store type.
@@ -52,7 +52,7 @@ o	AWSGlueConsoleFullAccess
 Create or Select Glue Database:
 •	Create a new Glue database (covid_19) to organize your crawled tables.
 Crawler Schedule:
-•	You can configure the crawler to run on-demand or schedule it (hourly, daily, weekly). For initial runs, manual triggering is recommended.
+•	You can configure the crawler to run on demand or schedule it (hourly, daily, weekly). For initial runs, manual triggering is recommended.
 Run the crawler. It usually takes 1-2 minutes to catalog the data and create table metadata in the Glue Data Catalog. Repeat this process for each dataset you want to catalog.
 What Happens Internally:
 •	When you create and run a crawler, it automatically creates a table in the Glue Data Catalog.
@@ -63,7 +63,7 @@ Why It Matters:
 •	The Glue crawler automatically catalogs your data, saving manual schema definition effort.
 •	It ensures your ETL jobs and queries work with up-to-date and accurate metadata.
 
-Step 4: Analyze Data with Amazon Athena and Build Data Model
+Step 4: Analyze Data with Amazon Athena and Build a Data Model
 Goal:
 Use Amazon Athena to query and analyze your crawled data directly on S3 using standard SQL, enabling quick insights and data model building without loading data elsewhere.
 What to Do:
@@ -80,8 +80,24 @@ o	Set this bucket as the output location in Athena settings.
 Why It Matters:
 •	Athena enables serverless, scalable SQL querying on your data without ETL or data movement.
 •	Using Glue catalog tables with Athena provides a seamless way to query semi-structured data stored on S3.
-•	Partitioning improves query performance and reduces cost by limiting data scanned.
+•	Partitioning improves query performance and reduces cost by limiting the data scanned.
 •	Athena is ideal for large datasets where local tools like Python would be inefficient.
+
+Step 5: Build a Data Model Visually and Prepare for a Data Warehouse
+Goal:
+Create a clear visual representation of your data to understand relationships and structure, and prepare a dimension model for the data warehouse.
+What to Do:
+•	Use a diagram tool like draw.io to build your data model visually.
+•	Export the table definitions (DDL) from Athena by clicking Generate DDL 
+•	Design a relational data model showing how tables relate, focusing on key columns such as fips (a primary key in most tables), state, and county.
+•	Use the relationships (like fips key) to join tables logically 
+•	Convert this relational model into a dimension model suitable for a data warehouse (star schema with fact and dimension tables).
+•	Plan your ETL and transformation scripts accordingly, which will create and populate these dimension tables in Amazon Redshift.
+•	Choose your ETL tool — for this project, Python is used (instead of Spark). Why It Matters:
+•	Visual data models improve clarity on how your data is structured and related.
+•	Dimension modeling optimizes the schema for analytic queries in Redshift, improving performance and usability.
+•	Clear models guide your ETL and transformation logic to accurately populate your data warehouse.
+
 
 
  
