@@ -11,7 +11,7 @@ o	Ensure the IAM user has permissions for:
 	AWS Glue
 	Amazon Redshift 
 •	Why It Matters:
-o	IAM users ensure principle of least privilege, keeping AWS access secure and auditable. You should avoid using the root user for operational tasks.
+o	IAM users ensure the principle of least privilege, keeping AWS access secure and auditable. You should avoid using the root user for operational tasks.
  
 
 Step 2: Upload the dataset to your S3 bucket
@@ -129,6 +129,41 @@ Tools and Files:
 Why This Matters:
 •	This step automates the data transformation and loading process, making the pipeline scalable, repeatable, and maintainable.
 •	Using AWS Glue and Redshift together creates a powerful data warehousing solution optimized for analytics.
+
+Step 8: Copy Data to Redshift Using AWS Glue Job
+Goal:
+This step covers loading the transformed data from S3 into Amazon Redshift by using an AWS Glue Python job. The goal is to build and populate Redshift tables based on the dimension model created earlier.
+Summary of the Process:
+1.	Recap of Previous Steps:
+o	Built the relational data model and converted it to a dimension (star schema) model.
+o	Queried and transformed data using Athena and Python scripts.
+o	Stored transformed data back to S3.
+2.	Create Redshift Cluster:
+o	Set up a Redshift cluster where the data warehouse tables will be created.
+3.	Create Tables in Redshift:
+o	Use the dimension model schema to create tables such as DimDate, DimHospital, DimRegion, and FactCovid in Redshift.
+4.	Write COPY Commands:
+o	Use Redshift’s COPY command to load data efficiently from S3 into these tables.
+5.	Set Up AWS Glue Job:
+o	Create a Glue job (e.g., s3_glue_covid_data) using Python Shell and Python 3.
+o	Glue has limited support for external libraries, so you must:
+	Download the external redshift-connector library (e.g., version 2.0.889) from PyPI.
+	Upload this package to your S3 bucket (e.g., under covid-19-data-de/package/).
+	Reference this package in the Glue job’s Python library path.
+6.	Glue Job Script:
+o	The job script (provided as aws_glue_job.py in the scripts/ folder) includes:
+	Connecting to Redshift using redshift_connector.
+	Creating necessary tables in Redshift.
+	Executing COPY commands to load data from S3 to Redshift.
+	Using autocommit to ensure SQL statements are committed immediately.
+7.	Run the Glue Job:
+o	Deploy and save the Glue job.
+o	Run the job from the Glue console.
+o	Monitor the execution logs for success or errors.
+8.	Verify Data Load:
+o	Once the Glue job finishes, verify the tables and data in Redshift using SQL queries.
+o	The data from transformed CSV files should now be loaded into Redshift, ready for further analysis or visualization.
+
 
 
  
