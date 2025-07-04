@@ -1,1 +1,69 @@
+Project Workflow: AWS-Based Data Pipeline for COVID-19 Dataset
+
+Step 1: Log in with the IAM user you created
+•	Goal: Securely access AWS services using an IAM (Identity and Access Management) user with limited permissions.
+•	What to Do:
+o	Go to AWS Management Console.
+o	Sign in using the IAM user credentials (not the root user).
+o	Ensure the IAM user has permissions for:
+	Amazon S3 
+	Amazon Athena
+	AWS Glue
+	Amazon Redshift 
+•	Why It Matters:
+o	IAM users ensure principle of least privilege, keeping AWS access secure and auditable. You should avoid using the root user for operational tasks.
+ 
+
+Step 2: Upload the dataset to your S3 bucket
+•	Goal: Store the raw COVID-19 dataset in a centralized, durable, and scalable storage (S3) for processing.
+•	What to Do:
+o	Go to Amazon S3 service.
+o	Navigate to the S3 bucket you created 
+o	Upload your dataset files manually or 
+o	Use the AWS Console or the AWS CLI:
+aws s3 cp /path/to/local/file.csv s3://de-covid19-data-de/
+•	Why It Matters:
+o	Amazon S3 is the source layer in your modern data architecture.
+o	All downstream services (Glue crawler, Athena, Redshift) will reference this data.
+
+ 
+
+Step 3: Use AWS Glue Crawler to Analyze Data Structure
+Goal:
+Automatically discover the schema and metadata of your data to build an accurate data model before processing.
+
+What to Do:
+Create a Glue crawler for each dataset:
+•	Name as table name for easy identification
+•	Specify the crawler source type:
+o	Since you are starting fresh, choose Data stores as the data source.
+o	Select Amazon S3 as the data store type.
+•	Set the connection to No connection or keep default if not using a VPC connection.
+•	Important: Provide the path to the folder (S3 bucket + folder path), not individual files. The crawler will scan all files inside the folder automatically.
+•	Run the crawler to extract schema details such as number of columns, data types, and partitions.
+Create an IAM Role for Glue:
+•	Go to the AWS IAM console and create a new role.
+•	Select Glue as the trusted service.
+•	Attach the following permissions policies:
+o	AmazonS3FullAccess
+o	AWSGlueServiceRole
+o	AWSGlueConsoleFullAccess
+•	You can create this role during the crawler setup or beforehand. This role allows Glue to access your S3 data and manage resources.
+Create or Select Glue Database:
+•	Create a new Glue database (covid_19) to organize your crawled tables.
+Crawler Schedule:
+•	You can configure the crawler to run on-demand or schedule it (hourly, daily, weekly). For initial runs, manual triggering is recommended.
+Run the crawler. It usually takes 1-2 minutes to catalog the data and create table metadata in the Glue Data Catalog. Repeat this process for each dataset you want to catalog.
+What Happens Internally:
+•	When you create and run a crawler, it automatically creates a table in the Glue Data Catalog.
+•	This catalog stores all metadata related to your data files, such as column names, types, record counts, and file locations.
+•	The catalog acts as a centralized metadata repository, which Athena and other AWS services query to understand your data structure.
+•	Using Glue and Athena together means you don’t have to manually manage schemas; Glue handles it for you.
+Why It Matters:
+•	The Glue crawler automatically catalogs your data, saving manual schema definition effort.
+•	It ensures your ETL jobs and queries work with up-to-date and accurate metadata.
+
+ 
+
+ 
 
