@@ -98,6 +98,19 @@ What to Do:
 •	Dimension modeling optimizes the schema for analytic queries in Redshift, improving performance and usability.
 •	Clear models guide your ETL and transformation logic to accurately populate your data warehouse.
 
+Step 6: Convert the Relational Data Model into a Dimension Model (Star Schema) - Python
+Goal:
+Transform the relational model into a star schema dimension model optimized for a data warehouse.
+What to Do:
+•	Understand that the star schema consists of one central fact table surrounded by multiple dimension tables.
+•	The fact table (factCovid) stores the core measurable data — COVID-related facts like confirmed cases, deaths, recoveries, active cases, positives, negatives, hospitalized counts, and discharges. This table has a primary key to uniquely identify each record.
+•	Surrounding the fact table are dimension tables that provide descriptive context:
+o	Region dimension: Contains geographic data such as state, province, latitude, longitude, county, and state abbreviation — useful for spatial analyses and mapping.
+o	Hospital dimension: Includes hospital-specific details like hospital name, type, address, city, state, latitude, and longitude — enabling tracking of hospitals per region.
+o	Date dimension: Stores date-related attributes such as the full date, year, month, day of week, and whether the day is a weekend — useful for time-based analysis and reporting.
+•	Assign primary keys in dimension tables for efficient joins to the fact table.
+•	Use this star schema as the blueprint for creating your Redshift tables and building ETL processes that load and transform data accordingly.
+
 
 
  
