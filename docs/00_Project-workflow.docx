@@ -111,6 +111,24 @@ o	Date dimension: Stores date-related attributes such as the full date, year, mo
 •	Assign primary keys in dimension tables for efficient joins to the fact table.
 •	Use this star schema as the blueprint for creating your Redshift tables and building ETL processes that load and transform data accordingly.
 
+Step 7: Write and Deploy the ETL Job in Python to Build the Data Warehouse
+Goal:
+After creating the relational and dimensional data models, the next step is to build the ETL pipeline that transforms and loads data to your data warehouse.
+What to Do:
+•	Connect to Athena and Query Data:
+Use Athena to query the raw data stored in S3 and perform necessary transformations. This leverages Athena’s serverless SQL querying on your S3 data.
+•	Transform Data:
+Write Python scripts that run ETL transformations on the queried data, cleaning and shaping it to fit the dimension model (star schema).
+•	Store Transformed Data in S3:
+After transformation, save the cleaned and structured data back to a designated S3 bucket.
+•	Deploy Python ETL Script to AWS Glue:
+Upload and configure the Python ETL job as an AWS Glue job to run your transformations at scale and on schedule.
+Tools and Files:
+•	The ETL Python script (covid19_etl.py) is provided in the scripts/ folder of the project repository.
+•	Use Visual Studio (or your preferred IDE) to edit and manage your ETL scripts before deploying to Glue.
+Why This Matters:
+•	This step automates the data transformation and loading process, making the pipeline scalable, repeatable, and maintainable.
+•	Using AWS Glue and Redshift together creates a powerful data warehousing solution optimized for analytics.
 
 
  
