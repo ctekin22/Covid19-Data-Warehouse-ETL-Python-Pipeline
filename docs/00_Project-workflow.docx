@@ -63,6 +63,27 @@ Why It Matters:
 •	The Glue crawler automatically catalogs your data, saving manual schema definition effort.
 •	It ensures your ETL jobs and queries work with up-to-date and accurate metadata.
 
+Step 4: Analyze Data with Amazon Athena and Build Data Model
+Goal:
+Use Amazon Athena to query and analyze your crawled data directly on S3 using standard SQL, enabling quick insights and data model building without loading data elsewhere.
+What to Do:
+•	Open Amazon Athena in the AWS Console.
+•	Set the Data source to AwsDataCatalog and select the Glue database you created (e.g., covid_19).
+•	Before running queries, configure a query result location in S3:
+o	Create a dedicated S3 bucket for Athena query outputs, e.g., de-covid19-athena-output.
+o	Set this bucket as the output location in Athena settings.
+•	Athena automatically recognizes tables created by Glue Crawlers. For example, the table name matches the last folder name in S3 (e.g., enigma_jhud).
+•	Use the Athena Query Editor to run SQL queries on your data.
+•	Preview tables to inspect columns and sample data (e.g., use SELECT * FROM enigma_jhud LIMIT 10).
+•	Athena supports partitioning based on S3 folder structure, which helps optimize queries when data is organized in subfolders like CSV1, CSV2, etc.
+•	While you can use Python (with Pandas or other libraries) to read S3 data, Athena is more efficient and scalable for large datasets because it queries directly on S3 without data movement.
+Why It Matters:
+•	Athena enables serverless, scalable SQL querying on your data without ETL or data movement.
+•	Using Glue catalog tables with Athena provides a seamless way to query semi-structured data stored on S3.
+•	Partitioning improves query performance and reduces cost by limiting data scanned.
+•	Athena is ideal for large datasets where local tools like Python would be inefficient.
+
+
  
 
  
